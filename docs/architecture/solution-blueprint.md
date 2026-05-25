@@ -1,0 +1,120 @@
+# .NET Solution Blueprint — Intelligent Controller
+
+> **Status: BLUEPRINT ONLY.** This document describes the solution to be created in a later,
+> separately-approved round. **Nothing here has been scaffolded, built, or run.** The `dotnet`
+> commands below are the intended steps for that future round.
+
+## Target framework
+
+**.NET 10 (LTS, released Nov 2025).** Rationale: .NET 9 is STS and nearing end-of-life; .NET 10 gives
+the longest support runway for an onsite, long-lived deployment. All key dependencies are compatible:
+stepfunc/dnp3 (.NET Standard 2.0), NModbus, and OpenTelemetry .NET. See
+[ADR-0004](../adr/0004-target-framework.md).
+
+## Solution layout
+
+```
+Sah.Ic.sln
+src/
+  Sah.Ic.Abstractions        # ports: IDevicePort, IPointMap, IEssFunctions,
+                             #        ICommandSource, IHistorianStore,
+                             #        IColdArchiveExporter, IModelRunner
+  Sah.Ic.Domain              # dispatch logic, MESA-ESS state machine, 1547 functions (no I/O)
+  Sah.Ic.Contracts           # DTOs / gRPC + REST contracts shared across services
+  Sah.Ic.Observability       # OpenTelemetry wiring (OTLP exporter), shared logging/metrics
+  Sah.Ic.Conformance         # [Conformance] attribute + Roslyn analyzer + RTM source generator
+  Sah.Ic.Protocols.Dnp3      # adapter over stepfunc/dnp3
+  Sah.Ic.Protocols.Modbus    # adapter over NModbus + SunSpec 700/800/200 maps
+  services/
+    Sah.Ic.Gateway           # SCADA/custom/(SEP2) ingress (REST + gRPC)
+    Sah.Ic.Dispatch          # control/optimization orchestration
+    Sah.Ic.DeviceGateway     # protocol I/O + multi-vendor driver/profile registry
+    Sah.Ic.Historian         # one-way async measurement sink + retention + cloud export
+    Sah.Ic.Analytics         # MATLAB model execution behind IModelRunner
+tests/
+  Sah.Ic.Domain.Tests
+  Sah.Ic.Abstractions.Tests
+  Sah.Ic.Protocols.Tests     # Modbus/DNP3 loopback adapters
+  Sah.Ic.Gateway.Tests
+  Sah.Ic.Dispatch.Tests
+  Sah.Ic.Historian.Tests
+  Sah.Ic.Analytics.Tests
+  Sah.Ic.IntegrationTests    # Testcontainers: Redis / TimescaleDB / MinIO
+  Sah.Ic.HilHarness          # OPTIONAL: Typhoon HIL orchestration (Python Test/SCADA API)
+docs/                        # (this documentation)
+deploy/
+  docker-compose.yml         # local stack: Redis, TimescaleDB, MinIO, OTel Collector
+  terraform/                 # environment definitions (see ../sdlc/environments.md)
+Directory.Build.props        # central target framework, analyzers, conformance analyzer ref
+```
+
+### Dependency direction
+
+`Domain` and `Abstractions` depend on nothing external. Protocol adapters depend on `Abstractions`.
+Services depend on `Domain` + `Abstractions` + the adapters they need + `Observability`. Nothing
+depends inward on a service. This is the hexagonal rule the build should enforce (e.g. via an
+architecture test).
+
+## Intended `dotnet` commands (for the later creation round)
+
+```bash
+# --- solution + core libraries ---
+dotnet new sln -n Sah.Ic
+dotnet new classlib  -n Sah.Ic.Abstractions   -o src/Sah.Ic.Abstractions
+dotnet new classlib  -n Sah.Ic.Domain         -o src/Sah.Ic.Domain
+dotnet new classlib  -n Sah.Ic.Contracts      -o src/Sah.Ic.Contracts
+dotnet new classlib  -n Sah.Ic.Observability  -o src/Sah.Ic.Observability
+dotnet new classlib  -n Sah.Ic.Conformance    -o src/Sah.Ic.Conformance
+dotnet new classlib  -n Sah.Ic.Protocols.Dnp3   -o src/Sah.Ic.Protocols.Dnp3
+dotnet new classlib  -n Sah.Ic.Protocols.Modbus -o src/Sah.Ic.Protocols.Modbus
+
+# --- services ---
+dotnet new worker  -n Sah.Ic.Gateway       -o src/services/Sah.Ic.Gateway
+dotnet new worker  -n Sah.Ic.Dispatch      -o src/services/Sah.Ic.Dispatch
+dotnet new worker  -n Sah.Ic.DeviceGateway -o src/services/Sah.Ic.DeviceGateway
+dotnet new worker  -n Sah.Ic.Historian     -o src/services/Sah.Ic.Historian
+dotnet new worker  -n Sah.Ic.Analytics     -o src/services/Sah.Ic.Analytics
+
+# --- tests (xUnit) ---
+dotnet new xunit -n Sah.Ic.Domain.Tests       -o tests/Sah.Ic.Domain.Tests
+dotnet new xunit -n Sah.Ic.Abstractions.Tests -o tests/Sah.Ic.Abstractions.Tests
+dotnet new xunit -n Sah.Ic.Protocols.Tests    -o tests/Sah.Ic.Protocols.Tests
+dotnet new xunit -n Sah.Ic.Gateway.Tests      -o tests/Sah.Ic.Gateway.Tests
+dotnet new xunit -n Sah.Ic.Dispatch.Tests     -o tests/Sah.Ic.Dispatch.Tests
+dotnet new xunit -n Sah.Ic.Historian.Tests    -o tests/Sah.Ic.Historian.Tests
+dotnet new xunit -n Sah.Ic.Analytics.Tests    -o tests/Sah.Ic.Analytics.Tests
+dotnet new xunit -n Sah.Ic.IntegrationTests   -o tests/Sah.Ic.IntegrationTests
+
+# --- add everything to the solution ---
+dotnet sln Sah.Ic.sln add $(find src tests -name '*.csproj')
+```
+
+### Key NuGet packages (added during creation)
+
+| Project | Packages |
+|---|---|
+| `Protocols.Dnp3` | stepfunc/dnp3 (`dnp3` managed binding) |
+| `Protocols.Modbus` | `NModbus` |
+| `Observability` | `OpenTelemetry`, `OpenTelemetry.Exporter.OpenTelemetryProtocol`, `OpenTelemetry.Extensions.Hosting` |
+| `Historian` | TimescaleDB via `Npgsql`; messaging client (MQTT/queue) |
+| `IntegrationTests` | `Testcontainers`, `Testcontainers.PostgreSql`, `Testcontainers.Redis`, MinIO container |
+| All test projects | `coverlet.collector`, `Microsoft.NET.Test.Sdk`, `xunit`, `FluentAssertions` |
+
+## Testing & coverage
+
+- One test project per component to reach the **80% line-coverage gate** (coverlet + ReportGenerator).
+- Coverage **excludes** generated gRPC stubs and thin `Program.cs` bootstrap.
+- An **architecture test** asserts the dependency direction above.
+- Tests carry xUnit traits linking them to standard requirement IDs (see traceability).
+
+## Build governance
+
+- `Directory.Build.props` centralizes the target framework, analyzer set, nullable/warnings-as-errors,
+  and references the **conformance analyzer** so the regulation↔code linkage is enforced on every build.
+
+## Future verification (when the solution is created)
+
+`dotnet build` on .NET 10 succeeds; `dotnet test` passes (Modbus/DNP3 loopbacks, domain state machine,
+integration via Testcontainers); coverage ≥ 80%; service `/health` healthy; OTel flows
+Gateway→Dispatch→DeviceGateway via the Collector; HIL reachable by config only; the conformance
+analyzer reports green and emits the RTM artifact.
