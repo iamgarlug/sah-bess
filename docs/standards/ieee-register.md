@@ -8,7 +8,32 @@ Matrix (see [`../sdlc/traceability.md`](../sdlc/traceability.md)).
 > Standard editions/years below reflect the latest known at time of writing. Confirm the exact edition
 > at procurement; `register.yaml` carries the authoritative IDs.
 
-## Tier 1 — core, directly shapes the IC
+**Compliance levels.** **NERC CIP is the mandatory compliance regime**; **IEEE/MESA conformance is
+recommended/optional.** Each entry in [`register.yaml`](register.yaml) carries a `compliance` field
+(`mandatory` | `recommended-optional` | `organizational`). See
+[ADR-0009](../adr/0009-regulatory-conformance.md).
+
+## Mandatory — NERC CIP (Critical Infrastructure Protection)
+
+Mandatory, FERC-enforced cybersecurity compliance for the bulk electric system. Representative set
+below; confirm the standards in scope per deployment based on BES Cyber System applicability.
+
+| ID | Standard | Scope |
+|---|---|---|
+| `NERC-CIP-002` | CIP-002 | BES Cyber System categorization |
+| `NERC-CIP-003` | CIP-003 | Security management controls |
+| `NERC-CIP-004` | CIP-004 | Personnel and training |
+| `NERC-CIP-005` | CIP-005 | Electronic security perimeter(s) |
+| `NERC-CIP-006` | CIP-006 | Physical security of BES Cyber Systems |
+| `NERC-CIP-007` | CIP-007 | System security management |
+| `NERC-CIP-008` | CIP-008 | Incident reporting and response planning |
+| `NERC-CIP-009` | CIP-009 | Recovery plans for BES Cyber Systems |
+| `NERC-CIP-010` | CIP-010 | Configuration change management and vulnerability assessments |
+| `NERC-CIP-011` | CIP-011 | Information protection |
+| `NERC-CIP-013` | CIP-013 | Supply chain risk management |
+| `NERC-CIP-014` | CIP-014 | Physical security |
+
+## Tier 1 — core, directly shapes the IC (recommended/optional)
 
 | ID | Standard | Title / scope | Why it matters here |
 |---|---|---|---|

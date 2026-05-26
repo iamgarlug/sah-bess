@@ -8,7 +8,11 @@
 
 **.NET 10 (LTS, released Nov 2025).** Rationale: .NET 9 is STS and nearing end-of-life; .NET 10 gives
 the longest support runway for an onsite, long-lived deployment. All key dependencies are compatible:
-stepfunc/dnp3 (.NET Standard 2.0), NModbus, and OpenTelemetry .NET. See
+stepfunc/dnp3 (.NET Standard 2.0), NModbus, and OpenTelemetry .NET.
+
+**Test framework: xUnit.** Chosen alongside the framework for first-class parallelism, the `[Trait]`
+mechanism used to link tests to conformance requirement IDs (feeds the Requirements Traceability
+Matrix), and broad ecosystem support (coverlet, Testcontainers). See
 [ADR-0004](../adr/0004-target-framework.md).
 
 ## Solution layout
@@ -19,10 +23,12 @@ src/
   Sah.Ic.Abstractions        # ports: IDevicePort, IPointMap, IEssFunctions,
                              #        ICommandSource, IHistorianStore,
                              #        IColdArchiveExporter, IModelRunner
+                             # dedicated shared-abstractions assembly; boundary enforced
+                             # by an architecture test (ADR-0008)
   Sah.Ic.Domain              # dispatch logic, MESA-ESS state machine, 1547 functions (no I/O)
   Sah.Ic.Contracts           # DTOs / gRPC + REST contracts shared across services
   Sah.Ic.Observability       # OpenTelemetry wiring (OTLP exporter), shared logging/metrics
-  Sah.Ic.Conformance         # [Conformance] attribute + Roslyn analyzer + RTM source generator
+  Sah.Ic.Conformance.Abstractions  # [Conformance] attribute only (runtime; annotates prod code)
   Sah.Ic.Protocols.Dnp3      # adapter over stepfunc/dnp3
   Sah.Ic.Protocols.Modbus    # adapter over NModbus + SunSpec 700/800/200 maps
   services/
@@ -41,6 +47,8 @@ tests/
   Sah.Ic.Analytics.Tests
   Sah.Ic.IntegrationTests    # Testcontainers: Redis / TimescaleDB / MinIO
   Sah.Ic.HilHarness          # OPTIONAL: Typhoon HIL orchestration (Python Test/SCADA API)
+build/
+  Sah.Ic.Conformance.Analyzer  # build-time only: Roslyn analyzer + RTM generator (ADR-0009)
 docs/                        # (this documentation)
 deploy/
   docker-compose.yml         # local stack: Redis, TimescaleDB, MinIO, OTel Collector
@@ -52,8 +60,8 @@ Directory.Build.props        # central target framework, analyzers, conformance 
 
 `Domain` and `Abstractions` depend on nothing external. Protocol adapters depend on `Abstractions`.
 Services depend on `Domain` + `Abstractions` + the adapters they need + `Observability`. Nothing
-depends inward on a service. This is the hexagonal rule the build should enforce (e.g. via an
-architecture test).
+depends inward on a service. This is the hexagonal rule, enforced by an architecture test
+([ADR-0008](../adr/0008-shared-abstractions-assembly.md)).
 
 ## Intended `dotnet` commands (for the later creation round)
 
@@ -64,9 +72,12 @@ dotnet new classlib  -n Sah.Ic.Abstractions   -o src/Sah.Ic.Abstractions
 dotnet new classlib  -n Sah.Ic.Domain         -o src/Sah.Ic.Domain
 dotnet new classlib  -n Sah.Ic.Contracts      -o src/Sah.Ic.Contracts
 dotnet new classlib  -n Sah.Ic.Observability  -o src/Sah.Ic.Observability
-dotnet new classlib  -n Sah.Ic.Conformance    -o src/Sah.Ic.Conformance
+dotnet new classlib  -n Sah.Ic.Conformance.Abstractions -o src/Sah.Ic.Conformance.Abstractions
 dotnet new classlib  -n Sah.Ic.Protocols.Dnp3   -o src/Sah.Ic.Protocols.Dnp3
 dotnet new classlib  -n Sah.Ic.Protocols.Modbus -o src/Sah.Ic.Protocols.Modbus
+
+# --- build-time tooling (not shipped at runtime) ---
+dotnet new classlib  -n Sah.Ic.Conformance.Analyzer -o build/Sah.Ic.Conformance.Analyzer
 
 # --- services ---
 dotnet new worker  -n Sah.Ic.Gateway       -o src/services/Sah.Ic.Gateway
@@ -86,7 +97,7 @@ dotnet new xunit -n Sah.Ic.Analytics.Tests    -o tests/Sah.Ic.Analytics.Tests
 dotnet new xunit -n Sah.Ic.IntegrationTests   -o tests/Sah.Ic.IntegrationTests
 
 # --- add everything to the solution ---
-dotnet sln Sah.Ic.sln add $(find src tests -name '*.csproj')
+dotnet sln Sah.Ic.sln add $(find src build tests -name '*.csproj')
 ```
 
 ### Key NuGet packages (added during creation)
@@ -102,7 +113,9 @@ dotnet sln Sah.Ic.sln add $(find src tests -name '*.csproj')
 
 ## Testing & coverage
 
-- One test project per component to reach the **80% line-coverage gate** (coverlet + ReportGenerator).
+- One test project per component, aiming at the **80% line-coverage goal** (coverlet + ReportGenerator).
+  80% is a goal tracked on a dashboard, **not a blocking gate** — emergency fixes may temporarily dip
+  below it, and the dashboard flags prominently when coverage is under 80%.
 - Coverage **excludes** generated gRPC stubs and thin `Program.cs` bootstrap.
 - An **architecture test** asserts the dependency direction above.
 - Tests carry xUnit traits linking them to standard requirement IDs (see traceability).
@@ -115,6 +128,6 @@ dotnet sln Sah.Ic.sln add $(find src tests -name '*.csproj')
 ## Future verification (when the solution is created)
 
 `dotnet build` on .NET 10 succeeds; `dotnet test` passes (Modbus/DNP3 loopbacks, domain state machine,
-integration via Testcontainers); coverage ≥ 80%; service `/health` healthy; OTel flows
-Gateway→Dispatch→DeviceGateway via the Collector; HIL reachable by config only; the conformance
-analyzer reports green and emits the RTM artifact.
+integration via Testcontainers); coverage tracked (80% goal; dashboard flags when below); service
+`/health` healthy; OTel flows Gateway→Dispatch→DeviceGateway via the Collector; HIL reachable by config
+only; the conformance analyzer reports green and emits the RTM artifact.

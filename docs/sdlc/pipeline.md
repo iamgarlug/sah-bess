@@ -13,12 +13,16 @@ demand. The CI platform recommendation (GitHub Actions) is captured in
 
 ## CI — on every pull request
 
-```
-build → unit + integration tests → 80% coverage gate → static analysis
-      → SBOM + open-source license scan → conformance-attribute check
+```mermaid
+flowchart LR
+  build --> tests[unit + integration tests]
+  tests --> sa[static analysis]
+  sa --> sbom[SBOM + license scan]
+  sbom --> conf[conformance-attribute check]
 ```
 
-- **Coverage gate:** fails under 80% line coverage (see solution blueprint).
+- **Coverage:** line coverage is **measured and published to a dashboard (80% goal)**, **not a blocking
+  gate** — emergency fixes may temporarily dip below 80%; the dashboard flags prominently when below.
 - **License/SBOM scan:** generates a Software Bill of Materials and verifies dependency licenses,
   enforcing the "prefer open source" policy and supporting audit.
 - **Conformance-attribute check:** the Roslyn analyzer rejects any `[Conformance(Standard=…)]`
@@ -27,13 +31,19 @@ build → unit + integration tests → 80% coverage gate → static analysis
 
 ## CD — progressive promotion
 
-```
-Dev ──▶ QA ──▶ Load/Perf ──▶ Typhoon HIL ──▶ ( Sales / Client / onsite release )
-        │      │             │
-        gate   gate          gate (HIL conformance sign-off)
+```mermaid
+flowchart LR
+  Dev -->|auto: tests pass| QA
+  QA -->|auto: tests pass| Perf[Load/Perf]
+  Perf --> HIL[Typhoon HIL]
+  Perf --> Sales[Sales / Demo]
+  HIL -->|MANUAL: HIL conformance sign-off| Onsite[Onsite production]
+  HIL -->|MANUAL: client provisioning| Client[Client testing]
 ```
 
-Each hop is an **automated deploy + automated test suite**, **followed by a manual approval gate**.
+Each hop is an **automated deploy + automated test suite**. **QA and Load/Perf promote automatically**
+when their test suites (unit, integration, regression, performance) pass — they are **not** manual
+gates. Manual approval gates apply only at the points listed below.
 
 ### Mandatory manual gates
 

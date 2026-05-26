@@ -52,8 +52,8 @@ Each service is a .NET worker and/or minimal API.
 
 ## Multi-vendor DER driver model
 
-**Yes — a device-abstraction layer is valuable**, even with SunSpec/MESA, because vendors implement
-partial or variant register maps, scaling factors, and quirks. `DeviceGateway` hosts a
+A device-abstraction layer is valuable even with SunSpec/MESA, because vendors implement partial or
+variant register maps, scaling factors, and quirks. `DeviceGateway` hosts a
 **driver/profile registry**: per-manufacturer/model profiles map raw protocol points → canonical domain
 signals via `IPointMap`.
 
@@ -80,8 +80,7 @@ Typhoon's Python Test/SCADA API, which lives in the test layer — not a product
 
 ## Observability vs. Historian — two separate concerns
 
-These were previously conflated under "Telemetry"; they are now explicitly distinct, which keeps
-coupling low.
+Observability and operational data are distinct concerns, kept separate to minimize coupling.
 
 - **Observability (OpenTelemetry).** Traces/metrics/logs for *running the software*, exported via
   **OTLP to a Collector**. This is **infrastructure**, not a microservice — no service depends on
@@ -89,8 +88,7 @@ coupling low.
 - **Historian.** Operational *measurement data* from devices/dispatch. The Historian is a **one-way
   async sink**: producers **publish** measurement events to a bus (MQTT/queue, Sparkplug-B-friendly)
   and the Historian **subscribes**. Producers never call it synchronously and do not depend on its
-  availability → coupling stays low. This directly answers the "does a single telemetry service
-  increase coupling?" concern: no, because it is an event consumer, not a synchronous dependency.
+  availability → coupling stays low.
 
 ## Data, caching & cloud (recommendation; captured as ADRs)
 
@@ -100,14 +98,16 @@ coupling low.
   data lake — see [ADR-0003](../adr/0003-cloud-vendor-neutral.md).
 - All behind `IHistorianStore` / `IColdArchiveExporter`, so the technology stays swappable.
 
-## MATLAB integration (recommendation)
+## MATLAB integration
 
-**MATLAB Compiler SDK** → a .NET assembly consumed by Analytics (no per-node runtime license), with
-**MATLAB Production Server** as the scalable alternative. Hidden behind `IModelRunner`. See
-[ADR-0006](../adr/0006-matlab-integration.md).
+Analytics consumes **MATLAB-exported C# assemblies** compiled as ordinary .NET libraries — **not** the
+MATLAB Compiler SDK runtime and **not** MATLAB Production Server. Invoked in-process behind
+`IModelRunner`. See [ADR-0006](../adr/0006-matlab-integration.md).
 
 ## Regulatory conformance is built in
 
-Code that implements a standard requirement carries a `[Conformance(...)]` attribute validated against
-the [standards register](../standards/register.yaml); a Requirements Traceability Matrix is generated
-per release. See [`../sdlc/traceability.md`](../sdlc/traceability.md).
+**NERC CIP is the mandatory compliance regime; IEEE/MESA conformance is recommended/optional.** Code
+that implements a tracked requirement carries a `[Conformance(...)]` attribute validated against the
+[standards register](../standards/register.yaml); a Requirements Traceability Matrix is generated per
+release. Decision recorded in [ADR-0009](../adr/0009-regulatory-conformance.md); mechanism in
+[`../sdlc/traceability.md`](../sdlc/traceability.md).

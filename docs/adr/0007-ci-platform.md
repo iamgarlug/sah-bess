@@ -5,8 +5,9 @@
 ## Context
 
 The parent SDLC program requires automation-first delivery with manual approval gates and ephemeral
-environments. The repository is hosted on GitHub. The pipeline must integrate coverage gates, SBOM/
-license scanning, the conformance-attribute check, and progressive promotion across environments.
+environments. The repository is hosted on GitHub. The pipeline must integrate coverage tracking
+(dashboard, not a gate), SBOM/license scanning, the conformance-attribute check, and progressive
+promotion across environments.
 
 ## Decision
 

@@ -7,8 +7,13 @@ regulations and the code (and tests) that satisfy them**.
 ## 1. Single source of truth
 
 [`docs/standards/register.yaml`](../standards/register.yaml) lists every governing standard with a
-stable `id` (e.g. `IEEE-1547-2018`) and, as implementation proceeds, the specific `clauses`
-implemented. The human-readable companion is [`ieee-register.md`](../standards/ieee-register.md).
+stable `id` (e.g. `NERC-CIP-007`, `IEEE-1547-2018`), a `compliance` level, and — as implementation
+proceeds — the specific `clauses` implemented. The human-readable companion is
+[`ieee-register.md`](../standards/ieee-register.md).
+
+**NERC CIP is the mandatory compliance regime** (`compliance: mandatory`); **IEEE/MESA conformance is
+recommended/optional** (`compliance: recommended-optional`). This distinction is recorded in
+[ADR-0009](../adr/0009-regulatory-conformance.md).
 
 ## 2. Code indicators — the `[Conformance]` attribute
 
