@@ -17,43 +17,60 @@ Matrix), and broad ecosystem support (coverlet, Testcontainers). See
 
 ## Solution layout
 
+There is no top-level solution file — each library and service is its own folder with nested
+`src/` and `tests/`. Libraries ship as NuGet packages.
+
 ```
-Sah.Ic.sln
-src/
-  Sah.Ic.Abstractions        # ports: IDevicePort, IPointMap, IEssFunctions,
-                             #        ICommandSource, IHistorianStore,
-                             #        IColdArchiveExporter, IModelRunner
-                             # dedicated shared-abstractions assembly; boundary enforced
-                             # by an architecture test (ADR-0008)
-  Sah.Ic.Domain              # dispatch logic, MESA-ESS state machine, 1547 functions (no I/O)
-  Sah.Ic.Contracts           # DTOs / gRPC + REST contracts shared across services
-  Sah.Ic.Observability       # OpenTelemetry wiring (OTLP exporter), shared logging/metrics
-  Sah.Ic.Conformance.Abstractions  # [Conformance] attribute only (runtime; annotates prod code)
-  Sah.Ic.Protocols.Dnp3      # adapter over stepfunc/dnp3
-  Sah.Ic.Protocols.Modbus    # adapter over NModbus + SunSpec 700/800/200 maps
-  services/
-    Sah.Ic.Gateway           # SCADA/custom/(SEP2) ingress (REST + gRPC)
-    Sah.Ic.Dispatch          # control/optimization orchestration
-    Sah.Ic.DeviceGateway     # protocol I/O + multi-vendor driver/profile registry
-    Sah.Ic.Historian         # one-way async measurement sink + retention + cloud export
-    Sah.Ic.Analytics         # MATLAB model execution behind IModelRunner
-tests/
-  Sah.Ic.Domain.Tests
-  Sah.Ic.Abstractions.Tests
-  Sah.Ic.Protocols.Tests     # Modbus/DNP3 loopback adapters
-  Sah.Ic.Gateway.Tests
-  Sah.Ic.Dispatch.Tests
-  Sah.Ic.Historian.Tests
-  Sah.Ic.Analytics.Tests
-  Sah.Ic.IntegrationTests    # Testcontainers: Redis / TimescaleDB / MinIO
-  Sah.Ic.HilHarness          # OPTIONAL: Typhoon HIL orchestration (Python Test/SCADA API)
+libraries/
+  Sah.Ic.Abstractions/         # ports: IDevicePort, IPointMap, IEssFunctions,
+    src/                       #        ICommandSource, IHistorianStore,
+    tests/                     #        IColdArchiveExporter, IModelRunner
+                               # dedicated shared-abstractions assembly; boundary enforced
+                               # by an architecture test (ADR-0009)
+  Sah.Ic.Domain/               # dispatch logic, MESA-ESS state machine, 1547 functions (no I/O)
+    src/
+    tests/
+  Sah.Ic.Contracts/            # DTOs / gRPC + REST contracts shared across services
+    src/
+    tests/
+  Sah.Ic.Observability/        # OpenTelemetry wiring (OTLP exporter), shared logging/metrics
+    src/
+    tests/
+  Sah.Ic.Conformance.Abstractions/  # [Conformance] attribute only (runtime; annotates prod code)
+    src/
+    tests/
+  Sah.Ic.Protocols.Dnp3/       # adapter over stepfunc/dnp3
+    src/
+    tests/
+  Sah.Ic.Protocols.Modbus/     # adapter over NModbus + SunSpec 700/800/200 maps
+    src/
+    tests/
+services/
+  Sah.Ic.Gateway/              # SCADA/custom/(SEP2) ingress (REST + gRPC)
+    src/
+    tests/
+  Sah.Ic.Dispatch/             # control/optimization orchestration
+    src/
+    tests/
+  Sah.Ic.DeviceGateway/        # protocol I/O + multi-vendor driver/profile registry
+    src/
+    tests/
+  Sah.Ic.Historian/            # one-way async measurement sink + retention + cloud export
+    src/
+    tests/
+  Sah.Ic.Analytics/            # MATLAB model execution behind IModelRunner
+    src/
+    tests/
+tests/                         # cross-cutting tests that don't belong to one project
+  Sah.Ic.IntegrationTests/     # Testcontainers: Redis / TimescaleDB / MinIO
+  Sah.Ic.HilHarness/           # OPTIONAL: Typhoon HIL orchestration (Python Test/SCADA API)
 build/
-  Sah.Ic.Conformance.Analyzer  # build-time only: Roslyn analyzer + RTM generator (ADR-0009)
-docs/                        # (this documentation)
+  Sah.Ic.Conformance.Analyzer/ # build-time only: Roslyn analyzer + RTM generator (ADR-0010)
+docs/                          # (this documentation)
 deploy/
-  docker-compose.yml         # local stack: Redis, TimescaleDB, MinIO, OTel Collector
-  terraform/                 # environment definitions (see ../sdlc/environments.md)
-Directory.Build.props        # central target framework, analyzers, conformance analyzer ref
+  docker-compose.yml           # local stack: Redis, TimescaleDB, MinIO, OTel Collector
+  terraform/                   # environment definitions (see ../sdlc/environments.md)
+Directory.Build.props          # central target framework, analyzers, conformance analyzer ref
 ```
 
 ### Dependency direction
@@ -66,38 +83,49 @@ depends inward on a service. This is the hexagonal rule, enforced by an architec
 ## Intended `dotnet` commands (for the later creation round)
 
 ```bash
-# --- solution + core libraries ---
-dotnet new sln -n Sah.Ic
-dotnet new classlib  -n Sah.Ic.Abstractions   -o src/Sah.Ic.Abstractions
-dotnet new classlib  -n Sah.Ic.Domain         -o src/Sah.Ic.Domain
-dotnet new classlib  -n Sah.Ic.Contracts      -o src/Sah.Ic.Contracts
-dotnet new classlib  -n Sah.Ic.Observability  -o src/Sah.Ic.Observability
-dotnet new classlib  -n Sah.Ic.Conformance.Abstractions -o src/Sah.Ic.Conformance.Abstractions
-dotnet new classlib  -n Sah.Ic.Protocols.Dnp3   -o src/Sah.Ic.Protocols.Dnp3
-dotnet new classlib  -n Sah.Ic.Protocols.Modbus -o src/Sah.Ic.Protocols.Modbus
+# --- libraries (each is a NuGet package with its own src/ and tests/) ---
+dotnet new classlib -n Sah.Ic.Abstractions             -o libraries/Sah.Ic.Abstractions/src
+dotnet new xunit    -n Sah.Ic.Abstractions.Tests       -o libraries/Sah.Ic.Abstractions/tests
+
+dotnet new classlib -n Sah.Ic.Domain                   -o libraries/Sah.Ic.Domain/src
+dotnet new xunit    -n Sah.Ic.Domain.Tests             -o libraries/Sah.Ic.Domain/tests
+
+dotnet new classlib -n Sah.Ic.Contracts                -o libraries/Sah.Ic.Contracts/src
+dotnet new xunit    -n Sah.Ic.Contracts.Tests          -o libraries/Sah.Ic.Contracts/tests
+
+dotnet new classlib -n Sah.Ic.Observability            -o libraries/Sah.Ic.Observability/src
+dotnet new xunit    -n Sah.Ic.Observability.Tests      -o libraries/Sah.Ic.Observability/tests
+
+dotnet new classlib -n Sah.Ic.Conformance.Abstractions -o libraries/Sah.Ic.Conformance.Abstractions/src
+dotnet new xunit    -n Sah.Ic.Conformance.Abstractions.Tests -o libraries/Sah.Ic.Conformance.Abstractions/tests
+
+dotnet new classlib -n Sah.Ic.Protocols.Dnp3           -o libraries/Sah.Ic.Protocols.Dnp3/src
+dotnet new xunit    -n Sah.Ic.Protocols.Dnp3.Tests     -o libraries/Sah.Ic.Protocols.Dnp3/tests
+
+dotnet new classlib -n Sah.Ic.Protocols.Modbus         -o libraries/Sah.Ic.Protocols.Modbus/src
+dotnet new xunit    -n Sah.Ic.Protocols.Modbus.Tests   -o libraries/Sah.Ic.Protocols.Modbus/tests
 
 # --- build-time tooling (not shipped at runtime) ---
-dotnet new classlib  -n Sah.Ic.Conformance.Analyzer -o build/Sah.Ic.Conformance.Analyzer
+dotnet new classlib -n Sah.Ic.Conformance.Analyzer     -o build/Sah.Ic.Conformance.Analyzer
 
-# --- services ---
-dotnet new worker  -n Sah.Ic.Gateway       -o src/services/Sah.Ic.Gateway
-dotnet new worker  -n Sah.Ic.Dispatch      -o src/services/Sah.Ic.Dispatch
-dotnet new worker  -n Sah.Ic.DeviceGateway -o src/services/Sah.Ic.DeviceGateway
-dotnet new worker  -n Sah.Ic.Historian     -o src/services/Sah.Ic.Historian
-dotnet new worker  -n Sah.Ic.Analytics     -o src/services/Sah.Ic.Analytics
+# --- services (each with its own src/ and tests/) ---
+dotnet new worker -n Sah.Ic.Gateway          -o services/Sah.Ic.Gateway/src
+dotnet new xunit  -n Sah.Ic.Gateway.Tests    -o services/Sah.Ic.Gateway/tests
 
-# --- tests (xUnit) ---
-dotnet new xunit -n Sah.Ic.Domain.Tests       -o tests/Sah.Ic.Domain.Tests
-dotnet new xunit -n Sah.Ic.Abstractions.Tests -o tests/Sah.Ic.Abstractions.Tests
-dotnet new xunit -n Sah.Ic.Protocols.Tests    -o tests/Sah.Ic.Protocols.Tests
-dotnet new xunit -n Sah.Ic.Gateway.Tests      -o tests/Sah.Ic.Gateway.Tests
-dotnet new xunit -n Sah.Ic.Dispatch.Tests     -o tests/Sah.Ic.Dispatch.Tests
-dotnet new xunit -n Sah.Ic.Historian.Tests    -o tests/Sah.Ic.Historian.Tests
-dotnet new xunit -n Sah.Ic.Analytics.Tests    -o tests/Sah.Ic.Analytics.Tests
-dotnet new xunit -n Sah.Ic.IntegrationTests   -o tests/Sah.Ic.IntegrationTests
+dotnet new worker -n Sah.Ic.Dispatch         -o services/Sah.Ic.Dispatch/src
+dotnet new xunit  -n Sah.Ic.Dispatch.Tests   -o services/Sah.Ic.Dispatch/tests
 
-# --- add everything to the solution ---
-dotnet sln Sah.Ic.sln add $(find src build tests -name '*.csproj')
+dotnet new worker -n Sah.Ic.DeviceGateway    -o services/Sah.Ic.DeviceGateway/src
+dotnet new xunit  -n Sah.Ic.DeviceGateway.Tests -o services/Sah.Ic.DeviceGateway/tests
+
+dotnet new worker -n Sah.Ic.Historian        -o services/Sah.Ic.Historian/src
+dotnet new xunit  -n Sah.Ic.Historian.Tests  -o services/Sah.Ic.Historian/tests
+
+dotnet new worker -n Sah.Ic.Analytics        -o services/Sah.Ic.Analytics/src
+dotnet new xunit  -n Sah.Ic.Analytics.Tests  -o services/Sah.Ic.Analytics/tests
+
+# --- cross-cutting tests ---
+dotnet new xunit -n Sah.Ic.IntegrationTests  -o tests/Sah.Ic.IntegrationTests
 ```
 
 ### Key NuGet packages (added during creation)

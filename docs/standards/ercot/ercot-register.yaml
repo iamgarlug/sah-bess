@@ -12,7 +12,7 @@ schema_version: 2
 standards:
   # ============================================================
   # MANDATORY — ERCOT Nodal Protocols
-  # Source documents: docs/standards/ercot/nodal/protocols-current/
+  # Source documents: docs/standards/ercot/nodal/protocols-2026-06/
   # Published: https://www.ercot.com/mktrules/nprotocols/current
   # ============================================================
   - id: ERCOT-NODAL-PROTOCOLS
@@ -24,7 +24,7 @@ standards:
 
   # ============================================================
   # MANDATORY — ERCOT Nodal Operating Guides
-  # Source documents: docs/standards/ercot/nodal/operating-guides-current/
+  # Source documents: docs/standards/ercot/nodal/operating-guides-2026-02/
   # Published: https://www.ercot.com/mktrules/guides/noperating/current
   # ============================================================
   - id: ERCOT-NODAL-OPERATING-GUIDES

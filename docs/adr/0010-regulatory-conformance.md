@@ -21,7 +21,7 @@ and auditors need to see which requirements are implemented and tested.
   - a `[Conformance(Standard, Clause, Requirement)]` attribute on implementing code,
   - a generated **Requirements Traceability Matrix** (standard → code symbol → covering test),
   - a tamper-evident audit log for runtime evidence.
-- **Tooling placement** (resolving "should Conformance be in `src/`?"):
+- **Tooling Placement**
   - the `[Conformance]` attribute is a small **runtime** assembly, **`Sah.Ic.Conformance.Abstractions`**
     in `src/` (production code carries the annotations),
   - the **Roslyn analyzer + RTM generator** are **build-time tooling** in **`build/Sah.Ic.Conformance.Analyzer`**,

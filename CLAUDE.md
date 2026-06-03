@@ -10,7 +10,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 dotnet build
-dotnet test
 dotnet test /p:CollectCoverage=true /p:CoverageFormat=opencover
 ```
 
@@ -24,22 +23,51 @@ Coverage target is 80% (tracked on a dashboard, not a blocking gate).
 
 ### Planned Project Layout
 
+Each library and service is its own folder with nested `src/` and `tests/`. Libraries are
+published as NuGet packages.
+
 ```
-src/
+libraries/
   Sah.Ic.Domain/                    # Dispatch logic, MESA-ESS state machine, IEEE 1547 grid-support — no dependencies
+    src/
+    tests/
   Sah.Ic.Abstractions/              # Ports: IDevicePort, IPointMap, IEssFunctions, ICommandSource, IHistorianStore, IColdArchiveExporter, IModelRunner
+    src/
+    tests/
   Sah.Ic.Contracts/                 # Cross-service DTOs
+    src/
+    tests/
   Sah.Ic.Observability/             # OpenTelemetry wiring (OTLP export)
+    src/
+    tests/
   Sah.Ic.Conformance.Abstractions/  # Runtime [Conformance] attribute
+    src/
+    tests/
   Sah.Ic.Protocols.Dnp3/            # DNP3 adapter via stepfunc/dnp3
+    src/
+    tests/
   Sah.Ic.Protocols.Modbus/          # Modbus adapter via NModbus + SunSpec 700/800/200 point maps
+    src/
+    tests/
   Sah.Ic.Conformance.Analyzer/      # Roslyn build-time analyzer — validates [Conformance] attributes against docs/standards/register.yaml
+    src/
+    tests/
 services/
   Gateway/        # SCADA/SEP2 command ingress (REST + gRPC)
+    src/
+    tests/
   Dispatch/       # Orchestration, MESA-ESS state machine
+    src/
+    tests/
   DeviceGateway/  # Protocol I/O + multi-vendor DER driver/profile registry
+    src/
+    tests/
   Historian/      # One-way async operational time-series sink + cold export (Parquet → S3-compatible)
+    src/
+    tests/
   Analytics/      # MATLAB model execution (SoC/SoH, forecasting, optimization)
+    src/
+    tests/
 ```
 
 `Directory.Build.props` will enforce the target framework, enable analyzers, and wire up `Sah.Ic.Conformance.Analyzer` for every project.
@@ -70,7 +98,7 @@ HIL test hardware is interchangeable with real devices via configuration only; n
 
 Two sets of standards are **mandatory**:
 
-1. **ERCOT** — both ERCOT Nodal Protocols and ERCOT Nodal Operating Guides. Source documents are in `docs/standards/ercot-nodal/protocols-current/` and `docs/standards/ercot-nodal/operating-guides-current/`.
+1. **ERCOT** — both ERCOT Nodal Protocols and ERCOT Nodal Operating Guides. Source documents are in `docs/standards/ercot/nodal/protocols-2026-06/` and `docs/standards/ercot/nodal/operating-guides-2026-02/`.
 2. **NERC Reliability Standards** — proposed mandatory; not yet confirmed for this deployment. Current published standards: https://www.nerc.com/standards/reliability-standards
 
 IEEE 1547 and MESA-ESS conformance are recommended/optional.

@@ -1,6 +1,6 @@
 # ADR-0001: ADR process — tracked in GitHub
 
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 

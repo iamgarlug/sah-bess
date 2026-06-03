@@ -2,11 +2,12 @@
 
 Each ADR captures one decision: its context, the decision, status, and consequences. ADRs marked
 **Proposed** are recommendations to be confirmed; **Accepted** are settled; **Deferred** are
-deliberately left open with a default recommendation recorded.
+deliberately left open with a default recommendation recorded; **Rejected** are decisions that were
+considered and explicitly turned down; **Superseded** are replaced by a later ADR.
 
 | ADR | Title | Status |
 |---|---|---|
-| [0001](0001-adr-process.md) | ADR process — tracked in GitHub | Proposed |
+| [0001](0001-adr-process.md) | ADR process — tracked in GitHub | Accepted |
 | [0002](0002-hexagonal-architecture.md) | Hexagonal (ports & adapters) for the IC core | Accepted |
 | [0003](0003-protocol-libraries.md) | Protocol libraries: stepfunc/dnp3 + NModbus | Accepted |
 | [0004](0004-cloud-vendor-neutral.md) | Vendor-neutral cloud (OTLP + S3-compatible + Parquet) | Accepted |

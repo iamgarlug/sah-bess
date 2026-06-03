@@ -37,7 +37,7 @@ Each service is a .NET worker and/or minimal API.
 | **Gateway** | Ingress for **SCADA**, **custom**, and (future) **SEP2** commands (REST + gRPC); normalizes external requests into domain commands. *SEP2 = Smart Energy Profile 2.0 (IEEE 2030.5): an IP/HTTP(S) utility↔DER protocol, e.g. California Rule 21 / DERMS.* |
 | **Dispatch** | Control/optimization orchestration; owns the **MESA-ESS operational state machine**; calls Analytics for model-driven decisions. |
 | **DeviceGateway** | Protocol I/O plus the **multi-vendor DER driver registry** (below). |
-| **Historian** | Operational time-series **sink** + tiered retention + cloud export. *(Renamed from "Telemetry" to avoid confusion with observability.)* |
+| **Historian** | Operational time-series **sink** + tiered retention + cloud export. |
 | **Analytics** | Invokes MATLAB models (**SoC/SoH**, forecasting, optimization) behind `IModelRunner`. *SoC = State of Charge (%, how full); SoH = State of Health (%, capacity/degradation vs. new).* |
 
 ## Ports (core interfaces, in `Sah.Ic.Abstractions`)
