@@ -1,0 +1,30 @@
+# SAH-BESS standards register — top-level index.
+#
+# This file is the entry point consumed by:
+#   - the Roslyn conformance analyzer (validates [Conformance(Standard=...)] IDs exist across all registers),
+#   - the Requirements Traceability Matrix (RTM) generator (standard -> code symbol -> tests).
+#
+# Standards are split into per-body register files listed below under `registers`.
+# Each entry's `id` is the stable key referenced from [Conformance(...)] attributes and xUnit traits.
+#
+# `compliance` is one of: mandatory | proposed-mandatory | recommended-optional | organizational.
+#   - ERCOT (Nodal Protocols + Nodal Operating Guides) are MANDATORY.
+#   - NERC Reliability Standards are PROPOSED MANDATORY (not yet confirmed for this deployment).
+#   - IEEE / MESA / IEC / SunSpec conformance is RECOMMENDED / OPTIONAL.
+#   - Safety listings (UL / NFPA) are ORGANIZATIONAL (hardware/installation scope).
+# See ADR-0010 (docs/adr/0010-regulatory-conformance.md).
+
+schema_version: 2
+
+registers:
+  - id: ercot
+    file: docs/standards/ercot/ercot-register.yaml
+    compliance: mandatory
+    companion: docs/standards/ercot/nodal/ercot-nodal-register.md
+  - id: nerc
+    file: docs/standards/nerc/nerc-register.yaml
+    compliance: proposed-mandatory
+  - id: ieee
+    file: docs/standards/ieee/ieee-register.yaml
+    compliance: recommended-optional
+    companion: docs/standards/ieee/ieee-register.md

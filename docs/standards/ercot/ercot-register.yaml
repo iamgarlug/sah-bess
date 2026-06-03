@@ -1,0 +1,35 @@
+# ERCOT standards register — SAH-BESS
+#
+# Consumed by the Roslyn conformance analyzer and RTM generator via register.yaml.
+# `id` values are the stable keys used in [Conformance(...)] attributes and xUnit traits.
+#
+# compliance: mandatory
+# See ADR-0010 (docs/adr/0010-regulatory-conformance.md).
+# Human-readable companion: docs/standards/ercot/nodal/ercot-nodal-register.md
+
+schema_version: 2
+
+standards:
+  # ============================================================
+  # MANDATORY — ERCOT Nodal Protocols
+  # Source documents: docs/standards/ercot/nodal/protocols-2026-06/
+  # Published: https://www.ercot.com/mktrules/nprotocols/current
+  # ============================================================
+  - id: ERCOT-NODAL-PROTOCOLS
+    title: ERCOT Nodal Protocols
+    tier: mandatory
+    category: market-operations
+    compliance: mandatory
+    clauses: []
+
+  # ============================================================
+  # MANDATORY — ERCOT Nodal Operating Guides
+  # Source documents: docs/standards/ercot/nodal/operating-guides-2026-02/
+  # Published: https://www.ercot.com/mktrules/guides/noperating/current
+  # ============================================================
+  - id: ERCOT-NODAL-OPERATING-GUIDES
+    title: ERCOT Nodal Operating Guides
+    tier: mandatory
+    category: market-operations
+    compliance: mandatory
+    clauses: []

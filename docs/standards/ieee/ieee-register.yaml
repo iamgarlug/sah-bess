@@ -1,0 +1,213 @@
+# IEEE / MESA / IEC / SunSpec standards register — SAH-BESS
+#
+# Consumed by the Roslyn conformance analyzer and RTM generator via register.yaml.
+# `id` values are the stable keys used in [Conformance(...)] attributes and xUnit traits.
+#
+# compliance: recommended-optional (IEEE/MESA/IEC/SunSpec) | organizational (UL/NFPA safety)
+# See ADR-0010 (docs/adr/0010-regulatory-conformance.md).
+# Human-readable companion: docs/standards/ieee/ieee-register.md
+#
+# Editions/years are best-known at time of writing; confirm at procurement.
+
+schema_version: 2
+
+standards:
+  # ============================================================
+  # RECOMMENDED / OPTIONAL — IEEE Tier 1: core, directly shapes the IC
+  # ============================================================
+  - id: IEEE-1547-2018
+    title: Interconnection and Interoperability of Distributed Energy Resources
+    tier: 1
+    category: interconnection
+    compliance: recommended-optional
+    procurement: buy-first
+    clauses: []          # populate as requirements are implemented, e.g. "4.6", "5.4"
+  - id: IEEE-1547.1-2020
+    title: Conformance Test Procedures for Equipment Interconnecting DER
+    tier: 1
+    category: conformance
+    compliance: recommended-optional
+    procurement: buy-first
+    clauses: []
+  - id: IEEE-1815-2012
+    title: DNP3 (Distributed Network Protocol)
+    tier: 1
+    category: protocol
+    compliance: recommended-optional
+    procurement: buy-next
+    clauses: []
+  - id: IEEE-1815.2-2026
+    title: DNP3 Application Profile for DER (MESA-DER)
+    tier: 1
+    category: protocol-profile
+    compliance: recommended-optional
+    procurement: buy-first
+    aliases: [MESA-DER]
+    clauses: []
+  - id: IEEE-2030.5-2018
+    title: Smart Energy Profile 2.0 (SEP2)
+    tier: 1
+    category: protocol
+    compliance: recommended-optional
+    procurement: conditional
+    clauses: []
+  - id: IEEE-2030.2.1-2019
+    title: Design, Operation, and Maintenance of Battery Energy Storage Systems
+    tier: 1
+    category: guidance
+    compliance: recommended-optional
+    procurement: guidance
+    clauses: []
+  - id: IEEE-2800-2022
+    title: Interconnection and Interoperability of Inverter-Based Resources on Transmission Systems
+    tier: 1
+    category: interconnection
+    compliance: recommended-optional
+    procurement: conditional
+    clauses: []
+  - id: IEEE-2686-2024
+    title: Battery Management Systems for Stationary Energy Storage
+    tier: 1
+    category: bms
+    compliance: recommended-optional
+    procurement: buy-next
+    clauses: []
+
+  # ---- IEEE Tier 2: supporting guidance ----
+  - id: IEEE-1547.2-2023
+    title: Application Guide for IEEE 1547
+    tier: 2
+    category: guidance
+    compliance: recommended-optional
+    procurement: guidance
+  - id: IEEE-1547.3-2023
+    title: Cybersecurity for DER Interconnection
+    tier: 2
+    category: cybersecurity
+    compliance: recommended-optional
+    procurement: guidance
+  - id: IEEE-1547.9-2022
+    title: Interconnecting Energy Storage DER
+    tier: 2
+    category: guidance
+    compliance: recommended-optional
+    procurement: guidance
+  - id: IEEE-2030-2011
+    title: Smart Grid Interoperability Reference Model
+    tier: 2
+    category: guidance
+    compliance: recommended-optional
+    procurement: guidance
+  - id: IEEE-2030.2-2015
+    title: Interoperability of Storage Systems with the Grid
+    tier: 2
+    category: guidance
+    compliance: recommended-optional
+    procurement: guidance
+  - id: IEEE-2030.3-2016
+    title: Test Procedures for Electric Energy Storage Equipment
+    tier: 2
+    category: conformance
+    compliance: recommended-optional
+    procurement: guidance
+  - id: IEEE-1815.1-2015
+    title: Mapping between IEC 61850 and DNP3
+    tier: 2
+    category: protocol
+    compliance: recommended-optional
+    procurement: guidance
+  - id: IEEE-1679-2020
+    title: Characterization and Evaluation of Energy Storage Technologies
+    tier: 2
+    category: guidance
+    compliance: recommended-optional
+    procurement: guidance
+  - id: IEEE-1881-2022
+    title: Battery Energy Storage Terminology
+    tier: 2
+    category: guidance
+    compliance: recommended-optional
+    procurement: guidance
+
+  # ---- Cybersecurity & timing (IEEE) ----
+  - id: IEEE-1686-2022
+    title: Intelligent Electronic Devices Cybersecurity Capabilities
+    tier: cyber
+    category: cybersecurity
+    compliance: recommended-optional
+    procurement: guidance
+  - id: IEEE-C37.240-2014
+    title: Cybersecurity Requirements for Substation Automation, Protection, and Control
+    tier: cyber
+    category: cybersecurity
+    compliance: recommended-optional
+    procurement: guidance
+  - id: IEEE-1588-2019
+    title: Precision Time Protocol (PTP)
+    tier: cyber
+    category: timing
+    compliance: recommended-optional
+    procurement: guidance
+  - id: IEEE-C37.118-2011
+    title: Synchrophasor Measurement and Data Transfer
+    tier: cyber
+    category: measurement
+    compliance: recommended-optional
+    procurement: optional
+  - id: IEEE-519-2022
+    title: Harmonic Control in Electric Power Systems
+    tier: cyber
+    category: power-quality
+    compliance: recommended-optional
+    procurement: guidance
+
+  # ---- Adjacent (non-IEEE) ----
+  - id: MESA-ESS
+    title: MESA-ESS DNP3 Application Profile for Energy Storage Systems
+    tier: adjacent
+    category: protocol-profile
+    compliance: recommended-optional
+    procurement: free
+    clauses: []
+  - id: MESA-DEVICE
+    title: MESA-Device (SunSpec Modbus) Models
+    tier: adjacent
+    category: protocol-profile
+    compliance: recommended-optional
+    procurement: free
+  - id: SUNSPEC-MODELS
+    title: SunSpec Modbus Model Definitions (700 / 800 / 802 / 200)
+    tier: adjacent
+    category: protocol-profile
+    compliance: recommended-optional
+    procurement: free
+  - id: IEC-61850
+    title: Communication Networks and Systems for Power Utility Automation (incl. 7-420 DER)
+    tier: adjacent
+    category: protocol
+    compliance: recommended-optional
+    procurement: optional
+  - id: IEC-62443
+    title: Security for Industrial Automation and Control Systems
+    tier: adjacent
+    category: cybersecurity
+    compliance: recommended-optional
+    procurement: guidance
+  - id: IEC-61400-25
+    title: Communications for Monitoring and Control of Wind Power Plants
+    tier: adjacent
+    category: protocol
+    compliance: recommended-optional
+    procurement: optional
+  - id: UL-9540
+    title: Energy Storage Systems and Equipment (incl. 9540A fire propagation test)
+    tier: adjacent
+    category: safety
+    compliance: organizational
+    procurement: organizational
+  - id: NFPA-855
+    title: Standard for the Installation of Stationary Energy Storage Systems
+    tier: adjacent
+    category: safety
+    compliance: organizational
+    procurement: organizational

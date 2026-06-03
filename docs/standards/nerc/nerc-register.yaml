@@ -1,0 +1,89 @@
+# NERC Reliability Standards register — SAH-BESS
+#
+# Consumed by the Roslyn conformance analyzer and RTM generator via register.yaml.
+# `id` values are the stable keys used in [Conformance(...)] attributes and xUnit traits.
+#
+# compliance: proposed-mandatory — mandatory status not yet confirmed for this deployment.
+# Promote entries to `mandatory` when bulk-electric-system applicability is confirmed per deployment.
+# See ADR-0010 (docs/adr/0010-regulatory-conformance.md).
+# Full standard listing: https://www.nerc.com/standards/reliability-standards
+
+schema_version: 2
+
+standards:
+  # ============================================================
+  # PROPOSED MANDATORY — NERC CIP (Critical Infrastructure Protection)
+  # Representative subset; confirm full applicability per deployment.
+  # ============================================================
+  - id: NERC-CIP-002
+    title: BES Cyber System Categorization
+    tier: proposed-mandatory
+    category: compliance
+    compliance: proposed-mandatory
+    clauses: []
+  - id: NERC-CIP-003
+    title: Security Management Controls
+    tier: proposed-mandatory
+    category: compliance
+    compliance: proposed-mandatory
+    clauses: []
+  - id: NERC-CIP-004
+    title: Personnel and Training
+    tier: proposed-mandatory
+    category: compliance
+    compliance: proposed-mandatory
+    clauses: []
+  - id: NERC-CIP-005
+    title: Electronic Security Perimeter(s)
+    tier: proposed-mandatory
+    category: compliance
+    compliance: proposed-mandatory
+    clauses: []
+  - id: NERC-CIP-006
+    title: Physical Security of BES Cyber Systems
+    tier: proposed-mandatory
+    category: compliance
+    compliance: proposed-mandatory
+    clauses: []
+  - id: NERC-CIP-007
+    title: System Security Management
+    tier: proposed-mandatory
+    category: compliance
+    compliance: proposed-mandatory
+    clauses: []
+  - id: NERC-CIP-008
+    title: Incident Reporting and Response Planning
+    tier: proposed-mandatory
+    category: compliance
+    compliance: proposed-mandatory
+    clauses: []
+  - id: NERC-CIP-009
+    title: Recovery Plans for BES Cyber Systems
+    tier: proposed-mandatory
+    category: compliance
+    compliance: proposed-mandatory
+    clauses: []
+  - id: NERC-CIP-010
+    title: Configuration Change Management and Vulnerability Assessments
+    tier: proposed-mandatory
+    category: compliance
+    compliance: proposed-mandatory
+    clauses: []
+  - id: NERC-CIP-011
+    title: Information Protection
+    tier: proposed-mandatory
+    category: compliance
+    compliance: proposed-mandatory
+    clauses: []
+  - id: NERC-CIP-013
+    title: Supply Chain Risk Management
+    tier: proposed-mandatory
+    category: compliance
+    compliance: proposed-mandatory
+    clauses: []
+  - id: NERC-CIP-014
+    title: Physical Security
+    tier: proposed-mandatory
+    category: compliance
+    compliance: proposed-mandatory
+    clauses: []
